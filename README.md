@@ -37,9 +37,9 @@ app.storage=postgres
 ## Reparto del equipo
 | Integrante | Responsabilidad |
 |----------|------------------|
-| A | Memoria, motor custom, OpenAPI y esqueleto multimódulo |
+| A | Memoria, OpenAPI y esqueleto multimódulo |
 | B | PostgreSQL, motor collections, modelo ER, scripts SQL y datos de prueba |
-| C | MongoDB/Neo4j, configuración, selectores y frontend |
+| C | MongoDB/Neo4j, configuración, selectores, motor custom y frontend |
 
 ## Flujo de trabajo
 - `main` protegida.
@@ -48,3 +48,7 @@ app.storage=postgres
 - Ramas por feature.
 - Mínimo 3 commits significativos por integrante por semana.
 - Cada PR debe incluir descripción, evidencia y enlace a tarjeta de Trello.
+
+## Gestión del proyecto
+Tablero Trello del equipo:
+https://trello.com/b/ZFFOY2x1/proyecto-final-progra-3
