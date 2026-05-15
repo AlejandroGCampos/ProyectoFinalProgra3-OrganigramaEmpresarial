@@ -4,13 +4,10 @@ import edu.umg.programacion3.organigrama.app.entity.NodeEntity;
 import edu.umg.programacion3.organigrama.app.jpa.PostgresNodeJpaRepository;
 import edu.umg.programacion3.organigrama.core.dto.TreeNodeDto;
 import edu.umg.programacion3.organigrama.core.repository.TreeRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
 public class PostgresTreeRepository implements TreeRepository {
 
     private final PostgresNodeJpaRepository jpaRepository;
@@ -39,4 +36,5 @@ public class PostgresTreeRepository implements TreeRepository {
         return jpaRepository.findById(id)
                 .map(e -> new TreeNodeDto(e.getId(), e.getValue(), e.getParentId()));
     }
+}
 }

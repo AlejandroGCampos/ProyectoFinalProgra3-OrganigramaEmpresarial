@@ -2,11 +2,11 @@ package edu.umg.programacion3.organigrama.app.repository;
 
 import edu.umg.programacion3.organigrama.core.dto.TreeNodeDto;
 import edu.umg.programacion3.organigrama.core.repository.TreeRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class MemoryTreeRepository implements TreeRepository {
