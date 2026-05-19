@@ -37,4 +37,3 @@ public class PostgresTreeRepository implements TreeRepository {
                 .map(e -> new TreeNodeDto(e.getId(), e.getValue(), e.getParentId()));
     }
 }
-}

@@ -1,6 +1,5 @@
 package edu.umg.programacion3.organigrama.core.strategy;
 
-import edu.umg.programacion3.organigrama.core.custom.CustomTreeNode;
 import edu.umg.programacion3.organigrama.core.dto.TreeNodeDto;
 
 import java.util.ArrayList;
@@ -31,5 +30,25 @@ public class CustomTreeAlgorithmStrategy implements TreeAlgorithmStrategy {
     @Override
     public boolean validateNoCycles(List<TreeNodeDto> nodes) {
         return true;
+    }
+
+    @Override
+    public int depth(List<TreeNodeDto> nodes, Long nodeId) {
+        return 0;
+    }
+
+    @Override
+    public List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId) {
+        return new ArrayList<>();
     }
 }
