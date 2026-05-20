@@ -27,7 +27,7 @@ public class TreeController {
 
     @PostMapping("/nodes/{parentId}/children")
     public TreeNodeDto addChild(
-            @PathVariable Long parentId,
+            @PathVariable("parentId") Long parentId,
             @RequestBody CreateChildRequest request
     ) {
         return treeService.addChild(parentId, request);
@@ -40,7 +40,7 @@ public class TreeController {
 
     @GetMapping("/tree/traversal")
     public List<TreeNodeDto> getTraversal(
-            @RequestParam String type
+            @RequestParam("type") String type
     ) {
         if ("BFS".equalsIgnoreCase(type)) {
             return treeService.getBfs();
@@ -61,28 +61,28 @@ public class TreeController {
 
     @GetMapping("/nodes/{nodeId}/depth")
     public int getDepth(
-            @PathVariable Long nodeId
+            @PathVariable("nodeId") Long nodeId
     ) {
         return treeService.getDepth(nodeId);
     }
 
     @GetMapping("/nodes/{nodeId}/path")
     public List<TreeNodeDto> getPath(
-            @PathVariable Long nodeId
+            @PathVariable("nodeId") Long nodeId
     ) {
         return treeService.getPath(nodeId);
     }
 
     @GetMapping("/nodes/{nodeId}/ancestors")
     public List<TreeNodeDto> getAncestors(
-            @PathVariable Long nodeId
+            @PathVariable("nodeId") Long nodeId
     ) {
         return treeService.getAncestors(nodeId);
     }
 
     @GetMapping("/tree/{nodeId}")
     public List<TreeNodeDto> getSubtree(
-            @PathVariable Long nodeId
+            @PathVariable("nodeId") Long nodeId
     ) {
         return treeService.getSubtree(nodeId);
     }
