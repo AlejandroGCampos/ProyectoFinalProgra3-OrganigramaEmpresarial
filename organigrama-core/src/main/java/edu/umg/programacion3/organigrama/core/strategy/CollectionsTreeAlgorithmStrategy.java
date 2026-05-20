@@ -5,8 +5,7 @@ import edu.umg.programacion3.organigrama.core.dto.TreeNodeDto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollectionsTreeAlgorithmStrategy
-        implements TreeAlgorithmStrategy {
+public class CollectionsTreeAlgorithmStrategy implements TreeAlgorithmStrategy {
 
     @Override
     public List<TreeNodeDto> buildTree(List<TreeNodeDto> nodes) {
@@ -31,5 +30,25 @@ public class CollectionsTreeAlgorithmStrategy
     @Override
     public boolean validateNoCycles(List<TreeNodeDto> nodes) {
         return true;
+    }
+
+    @Override
+    public int depth(List<TreeNodeDto> nodes, Long nodeId) {
+        return 0;
+    }
+
+    @Override
+    public List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId) {
+        return new ArrayList<>();
     }
 }

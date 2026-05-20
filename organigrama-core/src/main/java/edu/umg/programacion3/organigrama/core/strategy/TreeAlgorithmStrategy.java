@@ -15,4 +15,12 @@ public interface TreeAlgorithmStrategy {
     int height(List<TreeNodeDto> nodes);
 
     boolean validateNoCycles(List<TreeNodeDto> nodes);
+
+    int depth(List<TreeNodeDto> nodes, Long nodeId);
+
+    List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId);
+
+    List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId);
+
+    List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId);
 }
