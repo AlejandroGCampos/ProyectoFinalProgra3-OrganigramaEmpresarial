@@ -76,31 +76,104 @@ public class CustomTreeAlgorithmStrategy implements TreeAlgorithmStrategy {
 
         return calculateHeight(root);
     }
+@Override
+public boolean validateNoCycles(List<TreeNodeDto> nodes) {
 
-    @Override
-    public boolean validateNoCycles(List<TreeNodeDto> nodes) {
-        return true;
+    for (TreeNodeDto node : nodes) {
+
+        Long currentParentId = node.parentId();
+
+        while (currentParentId != null) {
+
+            if (currentParentId.equals(node.id())) {
+                return false;
+            }
+
+            TreeNodeDto parentNode = findNode(nodes, currentParentId);
+
+            if (parentNode == null) {
+                break;
+            }
+
+            currentParentId = parentNode.parentId();
+        }
     }
 
-    @Override
-    public int depth(List<TreeNodeDto> nodes, Long nodeId) {
-        return 0;
+    return true;
+}
+
+@Override
+public int depth(List<TreeNodeDto> nodes, Long nodeId) {
+
+    int depth = 0;
+
+    TreeNodeDto current = findNode(nodes, nodeId);
+
+    while (current != null && current.parentId() != null) {
+
+        depth++;
+
+        current = findNode(nodes, current.parentId());
     }
 
-    @Override
-    public List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId) {
-        return new ArrayList<>();
+    return depth;
+}
+
+@Override
+public List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId) {
+
+    List<TreeNodeDto> result = new ArrayList<>();
+
+    TreeNodeDto current = findNode(nodes, nodeId);
+
+    while (current != null) {
+
+        result.add(0, current);
+
+        if (current.parentId() == null) {
+            break;
+        }
+
+        current = findNode(nodes, current.parentId());
     }
 
-    @Override
-    public List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId) {
-        return new ArrayList<>();
+    return result;
+}
+
+@Override
+public List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId) {
+
+    List<TreeNodeDto> result = new ArrayList<>();
+
+    TreeNodeDto current = findNode(nodes, nodeId);
+
+    while (current != null && current.parentId() != null) {
+
+        current = findNode(nodes, current.parentId());
+
+        if (current != null) {
+            result.add(current);
+        }
     }
 
-    @Override
-    public List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId) {
-        return new ArrayList<>();
+    return result;
+}
+
+@Override
+public List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId) {
+
+    CustomTreeNode root = buildCustomTree(nodes);
+
+    CustomTreeNode target = findCustomNodeRecursive(root, nodeId);
+
+    List<TreeNodeDto> result = new ArrayList<>();
+
+    if (target != null) {
+        collectDfs(target, result);
     }
+
+    return result;
+}
 
     private CustomTreeNode buildCustomTree(List<TreeNodeDto> nodes) {
 
@@ -197,4 +270,42 @@ public class CustomTreeAlgorithmStrategy implements TreeAlgorithmStrategy {
                 parentId
         );
     }
+
+    private TreeNodeDto findNode(List<TreeNodeDto> nodes, Long id) {
+
+    for (TreeNodeDto node : nodes) {
+
+        if (node.id().equals(id)) {
+            return node;
+        }
+    }
+
+    return null;
+}
+
+private CustomTreeNode findCustomNodeRecursive(CustomTreeNode node, Long id) {
+
+    if (node == null) {
+        return null;
+    }
+
+    if (node.getId().equals(id)) {
+        return node;
+    }
+
+    CustomTreeNode child = node.getFirstChild();
+
+    while (child != null) {
+
+        CustomTreeNode found = findCustomNodeRecursive(child, id);
+
+        if (found != null) {
+            return found;
+        }
+
+        child = child.getNextSibling();
+    }
+
+    return null;
+}
 }
