@@ -4,7 +4,6 @@ import edu.umg.programacion3.organigrama.core.dto.CreateChildRequest;
 import edu.umg.programacion3.organigrama.core.dto.CreateRootRequest;
 import edu.umg.programacion3.organigrama.core.dto.TreeNodeDto;
 import edu.umg.programacion3.organigrama.core.repository.TreeRepository;
-import edu.umg.programacion3.organigrama.core.strategy.CustomTreeAlgorithmStrategy;
 import edu.umg.programacion3.organigrama.core.strategy.TreeAlgorithmStrategy;
 
 import org.springframework.stereotype.Service;
@@ -18,9 +17,12 @@ public class TreeService {
 
     private final TreeAlgorithmStrategy treeAlgorithmStrategy;
 
-    public TreeService(TreeRepository treeRepository) {
+    public TreeService(
+            TreeRepository treeRepository,
+            TreeAlgorithmStrategy treeAlgorithmStrategy
+    ) {
         this.treeRepository = treeRepository;
-        this.treeAlgorithmStrategy = new CustomTreeAlgorithmStrategy();
+        this.treeAlgorithmStrategy = treeAlgorithmStrategy;
     }
 
     public TreeNodeDto createRoot(CreateRootRequest request) {
