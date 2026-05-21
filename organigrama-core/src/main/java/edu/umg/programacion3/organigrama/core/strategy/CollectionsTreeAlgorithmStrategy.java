@@ -144,27 +144,123 @@ public class CollectionsTreeAlgorithmStrategy implements TreeAlgorithmStrategy {
     }
 
     @Override
-    public boolean validateNoCycles(List<TreeNodeDto> nodes) {
-        return true;
+public boolean validateNoCycles(List<TreeNodeDto> nodes) {
+
+    Set<Long> visited = new HashSet<>();
+
+    for (TreeNodeDto node : nodes) {
+
+        Set<Long> currentPath = new HashSet<>();
+
+        TreeNodeDto current = node;
+
+        while (current != null) {
+
+            if (currentPath.contains(current.id())) {
+                return false;
+            }
+
+            currentPath.add(current.id());
+
+            Long parentId = current.parentId();
+
+            current = findNodeById(nodes, parentId);
+        }
+
+        visited.add(node.id());
     }
 
-    @Override
-    public int depth(List<TreeNodeDto> nodes, Long nodeId) {
-        return 0;
-    }
+    return true;
+}
 
     @Override
-    public List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId) {
-        return new ArrayList<>();
+public int depth(List<TreeNodeDto> nodes, Long nodeId) {
+
+    int depth = 0;
+
+    TreeNodeDto current = findNodeById(nodes, nodeId);
+
+    while (current != null && current.parentId() != null) {
+
+        depth++;
+
+        current = findNodeById(nodes, current.parentId());
     }
 
-    @Override
-    public List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId) {
-        return new ArrayList<>();
-    }
+    return depth;
+}
 
     @Override
-    public List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId) {
-        return new ArrayList<>();
+public List<TreeNodeDto> path(List<TreeNodeDto> nodes, Long nodeId) {
+
+    List<TreeNodeDto> result = new ArrayList<>();
+
+    TreeNodeDto current = findNodeById(nodes, nodeId);
+
+    while (current != null) {
+
+        result.add(0, current);
+
+        current = findNodeById(nodes, current.parentId());
     }
+
+    return result;
+}
+
+    @Override
+public List<TreeNodeDto> ancestors(List<TreeNodeDto> nodes, Long nodeId) {
+
+    List<TreeNodeDto> result = new ArrayList<>();
+
+    TreeNodeDto current = findNodeById(nodes, nodeId);
+
+    if (current != null) {
+        current = findNodeById(nodes, current.parentId());
+    }
+
+    while (current != null) {
+
+        result.add(current);
+
+        current = findNodeById(nodes, current.parentId());
+    }
+
+    return result;
+}
+
+    @Override
+public List<TreeNodeDto> subtree(List<TreeNodeDto> nodes, Long nodeId) {
+
+    List<TreeNodeDto> result = new ArrayList<>();
+
+    Map<Long, List<TreeNodeDto>> childrenMap = buildChildrenMap(nodes);
+
+    TreeNodeDto root = findNodeById(nodes, nodeId);
+
+    if (root != null) {
+        dfsRecursive(root, childrenMap, result);
+    }
+
+    return result;
+}
+
+
+private TreeNodeDto findNodeById(
+        List<TreeNodeDto> nodes,
+        Long nodeId
+) {
+
+    if (nodeId == null) {
+        return null;
+    }
+
+    for (TreeNodeDto node : nodes) {
+
+        if (node.id().equals(nodeId)) {
+            return node;
+        }
+    }
+
+    return null;
+}
 }
