@@ -8,58 +8,72 @@ info:
 servers:
   - url: http://localhost:8080/api/v1
 
+tags:
+  - name: Tree
+    description: Operaciones principales del árbol del organigrama
+
 paths:
 
   /nodes/root:
     post:
+      tags:
+        - Tree
       summary: Crear nodo raíz
-
+      operationId: createRoot
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRootRequest'
-
       responses:
-        '200':
+        '201':
           description: Nodo raíz creado correctamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TreeNode'
+        '400':
+          description: Solicitud inválida
 
   /nodes/{parentId}/children:
     post:
+      tags:
+        - Tree
       summary: Agregar hijo a un nodo padre
-
+      operationId: addChild
       parameters:
         - name: parentId
           in: path
           required: true
+          description: ID del nodo padre
           schema:
             type: integer
             format: int64
-
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateChildRequest'
-
       responses:
-        '200':
+        '201':
           description: Nodo hijo creado correctamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TreeNode'
+        '400':
+          description: Solicitud inválida
+        '404':
+          description: Nodo padre no encontrado
 
   /tree:
     get:
+      tags:
+        - Tree
       summary: Obtener árbol completo
-
+      operationId: getTree
       responses:
         '200':
           description: Árbol obtenido correctamente
@@ -70,13 +84,176 @@ paths:
                 items:
                   $ref: '#/components/schemas/TreeNode'
 
+  /tree/traversal:
+    get:
+      tags:
+        - Tree
+      summary: Obtener recorrido del árbol
+      operationId: getTraversal
+      parameters:
+        - name: type
+          in: query
+          required: true
+          description: Tipo de recorrido. Puede ser DFS o BFS.
+          schema:
+            type: string
+            enum:
+              - DFS
+              - BFS
+            example: DFS
+      responses:
+        '200':
+          description: Recorrido obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TreeNode'
+        '400':
+          description: Tipo de recorrido inválido
+
+  /tree/height:
+    get:
+      tags:
+        - Tree
+      summary: Obtener altura del árbol
+      operationId: getHeight
+      responses:
+        '200':
+          description: Altura del árbol obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 3
+
+  /tree/validate:
+    get:
+      tags:
+        - Tree
+      summary: Validar que el árbol no tenga ciclos
+      operationId: validateNoCycles
+      responses:
+        '200':
+          description: Resultado de validación del árbol
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+
+  /nodes/{nodeId}/depth:
+    get:
+      tags:
+        - Tree
+      summary: Obtener profundidad de un nodo
+      operationId: getDepth
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: ID del nodo
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Profundidad obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 2
+        '404':
+          description: Nodo no encontrado
+
+  /nodes/{nodeId}/path:
+    get:
+      tags:
+        - Tree
+      summary: Obtener ruta desde la raíz hasta un nodo
+      operationId: getPath
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: ID del nodo
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ruta obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TreeNode'
+        '404':
+          description: Nodo no encontrado
+
+  /nodes/{nodeId}/ancestors:
+    get:
+      tags:
+        - Tree
+      summary: Obtener ancestros de un nodo
+      operationId: getAncestors
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: ID del nodo
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ancestros obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TreeNode'
+        '404':
+          description: Nodo no encontrado
+
+  /tree/{nodeId}:
+    get:
+      tags:
+        - Tree
+      summary: Obtener subárbol desde un nodo
+      operationId: getSubtree
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: ID del nodo raíz del subárbol
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Subárbol obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TreeNode'
+        '404':
+          description: Nodo no encontrado
+
 components:
 
   schemas:
 
     CreateRootRequest:
       type: object
-
+      required:
+        - value
       properties:
         value:
           type: string
@@ -84,7 +261,8 @@ components:
 
     CreateChildRequest:
       type: object
-
+      required:
+        - value
       properties:
         value:
           type: string
@@ -92,17 +270,14 @@ components:
 
     TreeNode:
       type: object
-
       properties:
         id:
           type: integer
           format: int64
           example: 1
-
         value:
           type: string
           example: Gerencia
-
         parentId:
           type: integer
           format: int64
