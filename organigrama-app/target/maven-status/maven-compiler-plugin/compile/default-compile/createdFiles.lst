@@ -1,0 +1,11 @@
+edu\umg\programacion3\organigrama\app\repository\MongoTreeRepository.class
+edu\umg\programacion3\organigrama\app\jpa\PostgresNodeJpaRepository.class
+edu\umg\programacion3\organigrama\app\OrganigramaApplication.class
+edu\umg\programacion3\organigrama\app\jpa\MongoNodeRepository.class
+edu\umg\programacion3\organigrama\app\entity\NodeDocument.class
+edu\umg\programacion3\organigrama\app\entity\NodeEntity.class
+edu\umg\programacion3\organigrama\app\controller\TreeController.class
+edu\umg\programacion3\organigrama\app\service\TreeService.class
+edu\umg\programacion3\organigrama\app\repository\PostgresTreeRepository.class
+edu\umg\programacion3\organigrama\app\RepositoryConfig.class
+edu\umg\programacion3\organigrama\app\repository\MemoryTreeRepository.class

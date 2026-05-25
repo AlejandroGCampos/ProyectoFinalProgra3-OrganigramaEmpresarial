@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organigrama Empresarial</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
+        header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+        header h1 { font-size: 24px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; }
+        .selectors { display: flex; gap: 20px; flex-wrap: wrap; }
+        .selector-group { display: flex; flex-direction: column; gap: 5px; }
+        .selector-group label { font-weight: bold; font-size: 14px; }
+        select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; cursor: pointer; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 10px; }
+        .badge-storage { background: #3498db; color: white; }
+        .badge-strategy { background: #2ecc71; color: white; }
+        .form-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-weight: bold; font-size: 14px; }
+        input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success:hover { background: #27ae60; }
+        .tree-container { min-height: 100px; }
+        .tree-node { margin: 5px 0; }
+        .node-box { display: inline-block; background: #3498db; color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+        .node-box:hover { background: #2980b9; }
+        .node-box .node-id { font-size: 11px; opacity: 0.8; margin-left: 5px; }
+        .children { margin-left: 30px; border-left: 2px solid #3498db; padding-left: 15px; margin-top: 5px; }
+        .empty-message { color: #999; font-style: italic; }
+        .alert { padding: 10px 15px; border-radius: 4px; margin-top: 10px; font-size: 14px; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Organigrama Empresarial</h1>
+    <p>Sistema de gestión de estructuras jerárquicas</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Configuración
+            <span class="badge badge-storage" id="badge-storage">memory</span>
+            <span class="badge badge-strategy" id="badge-strategy">custom</span>
+        </h2>
+        <div class="selectors">
+            <div class="selector-group">
+                <label>Persistencia</label>
+                <select id="storage" onchange="updateBadges()">
+                    <option value="memory">Memoria</option>
+                    <option value="postgres">PostgreSQL</option>
+                    <option value="mongo">MongoDB</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label>Estrategia de árbol</label>
+                <select id="strategy" onchange="updateBadges()">
+                    <option value="custom">Custom</option>
+                    <option value="collections">Collections</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Agregar Nodos</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Valor del nodo</label>
+                <input type="text" id="nodeValue" placeholder="Ej: Gerencia" />
+            </div>
+            <div class="form-group">
+                <label>ID del padre (opcional)</label>
+                <input type="number" id="parentId" placeholder="Dejar vacío para raíz" />
+            </div>
+            <button class="btn-primary" onclick="addNode()">Agregar Nodo</button>
+            <button class="btn-success" onclick="loadTree()">Actualizar Árbol</button>
+        </div>
+        <div id="node-message"></div>
+    </div>
+
+    <div class="card">
+        <h2>Organigrama</h2>
+        <div class="tree-container" id="tree-container">
+            <p class="empty-message">Cargando organigrama...</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const API = 'http://localhost:8080/api/v1';
+
+    function getStorage() {
+        return document.getElementById('storage').value;
+    }
+
+    function getStrategy() {
+        return document.getElementById('strategy').value;
+    }
+
+    function updateBadges() {
+        document.getElementById('badge-storage').textContent = getStorage();
+        document.getElementById('badge-strategy').textContent = getStrategy();
+        loadTree();
+    }
+
+    async function loadTree() {
+        const storage = getStorage();
+        const strategy = getStrategy();
+        try {
+            const response = await fetch(`${API}/tree?storage=${storage}&strategy=${strategy}`);
+            const nodes = await response.json();
+            renderTree(nodes);
+        } catch (e) {
+            document.getElementById('tree-container').innerHTML = '<p class="empty-message">Error al cargar el árbol</p>';
+        }
+    }
+
+    function renderTree(nodes) {
+        const container = document.getElementById('tree-container');
+        if (!nodes || nodes.length === 0) {
+            container.innerHTML = '<p class="empty-message">No hay nodos en el organigrama</p>';
+            return;
+        }
+        const map = {};
+        nodes.forEach(n => map[n.id] = { ...n, children: [] });
+        let root = null;
+        nodes.forEach(n => {
+            if (n.parentId === null || n.parentId === undefined) {
+                root = map[n.id];
+            } else if (map[n.parentId]) {
+                map[n.parentId].children.push(map[n.id]);
+            }
+        });
+        container.innerHTML = root ? renderNode(root) : '<p class="empty-message">No se encontró nodo raíz</p>';
+    }
+
+    function renderNode(node) {
+        let html = `<div class="tree-node">
+            <span class="node-box" onclick="selectNode(${node.id})">
+                ${node.value} <span class="node-id">#${node.id}</span>
+            </span>`;
+        if (node.children && node.children.length > 0) {
+            html += '<div class="children">';
+            node.children.forEach(child => { html += renderNode(child); });
+            html += '</div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function selectNode(id) {
+        document.getElementById('parentId').value = id;
+    }
+
+    async function addNode() {
+        const value = document.getElementById('nodeValue').value.trim();
+        const parentId = document.getElementById('parentId').value.trim();
+        const storage = getStorage();
+        const messageDiv = document.getElementById('node-message');
+
+        if (!value) {
+            messageDiv.innerHTML = '<div class="alert alert-error">Por favor ingresa un valor para el nodo</div>';
+            return;
+        }
+
+        try {
+            let response;
+            if (!parentId) {
+                response = await fetch(`${API}/nodes/root?storage=${storage}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value })
+                });
+            } else {
+                response = await fetch(`${API}/nodes/${parentId}/children?storage=${storage}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value })
+                });
+            }
+
+            if (response.ok) {
+                messageDiv.innerHTML = '<div class="alert alert-success">Nodo agregado correctamente</div>';
+                document.getElementById('nodeValue').value = '';
+                document.getElementById('parentId').value = '';
+                loadTree();
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-error">Error al agregar el nodo</div>';
+            }
+        } catch (e) {
+            messageDiv.innerHTML = '<div class="alert alert-error">Error de conexión con el servidor</div>';
+        }
+
+        setTimeout(() => { messageDiv.innerHTML = ''; }, 3000);
+    }
+
+    loadTree();
+</script>
+
+</body>
+</html>
