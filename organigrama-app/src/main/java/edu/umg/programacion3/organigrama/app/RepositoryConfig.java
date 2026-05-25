@@ -1,5 +1,6 @@
 package edu.umg.programacion3.organigrama.app;
 
+import edu.umg.programacion3.organigrama.app.jpa.PostgresNodeJpaRepository;
 import edu.umg.programacion3.organigrama.app.repository.MemoryTreeRepository;
 import edu.umg.programacion3.organigrama.app.repository.MongoTreeRepository;
 import edu.umg.programacion3.organigrama.app.repository.PostgresTreeRepository;
@@ -7,7 +8,6 @@ import edu.umg.programacion3.organigrama.core.repository.TreeRepository;
 import edu.umg.programacion3.organigrama.core.strategy.CollectionsTreeAlgorithmStrategy;
 import edu.umg.programacion3.organigrama.core.strategy.CustomTreeAlgorithmStrategy;
 import edu.umg.programacion3.organigrama.core.strategy.TreeAlgorithmStrategy;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,10 +18,10 @@ import org.springframework.context.annotation.Primary;
 public class RepositoryConfig {
 
     @Value("${app.storage}")
-    private String storage;
+    private String defaultStorage;
 
     @Value("${app.tree-strategy}")
-    private String treeStrategy;
+    private String defaultTreeStrategy;
 
     @Autowired
     private MemoryTreeRepository memoryRepo;
@@ -30,23 +30,29 @@ public class RepositoryConfig {
     private MongoTreeRepository mongoRepo;
 
     @Autowired(required = false)
-    private PostgresTreeRepository postgresRepo;
+    private PostgresNodeJpaRepository postgresNodeJpaRepository;
 
     @Primary
     @Bean
     public TreeRepository treeRepository() {
+        return resolveRepository(defaultStorage);
+    }
 
+    @Bean
+    public TreeAlgorithmStrategy treeAlgorithmStrategy() {
+        return resolveStrategy(defaultTreeStrategy);
+    }
+
+    public TreeRepository resolveRepository(String storage) {
         return switch (storage) {
-            case "postgres" -> postgresRepo;
+            case "postgres" -> new PostgresTreeRepository(postgresNodeJpaRepository);
             case "mongo" -> mongoRepo;
             default -> memoryRepo;
         };
     }
 
-    @Bean
-    public TreeAlgorithmStrategy treeAlgorithmStrategy() {
-
-        return switch (treeStrategy) {
+    public TreeAlgorithmStrategy resolveStrategy(String strategy) {
+        return switch (strategy) {
             case "collections" -> new CollectionsTreeAlgorithmStrategy();
             default -> new CustomTreeAlgorithmStrategy();
         };

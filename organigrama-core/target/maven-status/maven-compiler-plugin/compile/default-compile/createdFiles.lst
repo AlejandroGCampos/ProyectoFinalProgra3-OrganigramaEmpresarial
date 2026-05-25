@@ -1,0 +1,8 @@
+edu\umg\programacion3\organigrama\core\dto\CreateChildRequest.class
+edu\umg\programacion3\organigrama\core\dto\CreateRootRequest.class
+edu\umg\programacion3\organigrama\core\strategy\TreeAlgorithmStrategy.class
+edu\umg\programacion3\organigrama\core\dto\TreeNodeDto.class
+edu\umg\programacion3\organigrama\core\custom\CustomTreeNode.class
+edu\umg\programacion3\organigrama\core\repository\TreeRepository.class
+edu\umg\programacion3\organigrama\core\strategy\CollectionsTreeAlgorithmStrategy.class
+edu\umg\programacion3\organigrama\core\strategy\CustomTreeAlgorithmStrategy.class
